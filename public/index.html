@@ -1,15 +1,93 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>GitHublytics</title>
-    <link href='./assets/css/style.css' rel='stylesheet' type='text/css'>
-  </head>
-  <body>
-    <ul class="sidebar">
-      <li class="sidebar-brand"><a href="">GitHublytics</a></li>
-      <li><a href="languages">Language decomposition</a></li>
-      <li><a href="">Coming soon</a></li>
-    </ul>
-  </body>
+<html class="no-js" lang="en">
+    <head>
+        <title>Bootstrap 4 Layout</title>
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+	      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway:400,800">
+        <link rel='stylesheet' href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="/assets/css/bootstrap.css">
+        <link rel="stylesheet" href="/assets/css/styles.css">
+        
+    </head>
+
+    <body>
+
+        <div class="container">
+            <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+                <a class="navbar-brand" href="#"><img src="assets/img/profile.png" class="border border-dark rounded-circle" width="50" height="50" alt="">  GitHublytics</a>
+                
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#about">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Try it!</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://twitter.com/github_lytics" target="_blank">Contact</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <div class="jumbotron text-center mt-4">
+                <h1 class="display-4 mt-5">Understand Your Gits</h1>
+                <p class="lead mt-2 mb-5">Try our analytics and learn more about your GitHub repo compositions</p>
+            
+                <p class="lead mt-5 mb-1">
+                    <a class="btn btn-outline-info btn-lg" href="#" role="button">Try it!</a>
+                </p>
+                <div class="btn-img mb-5">
+                    <img class="img-fluid" src="assets/img/leftJF.png" width='27' height='27' alt="">
+                    <img class="img-fluid" src="assets/img/topJF.png" width='27' height='27' alt="">
+                    <img class="img-fluid" src="assets/img/rightJF.png" width='27' height='27' alt="">
+                </div> 
+            </div>
+
+             <!-- About Section Start -->
+            <section id="about" class="mt-5">
+                <div class="container">
+                  <div class="section-header text-center">
+                    <h2 class="section-title" data-wow-delay="0.3s">About</h2>
+                  </div>
+                  <div class="row justify-content-center mt-4">
+                    <div class="card mx-5 my-5" style="width: 18rem;">
+                      <img src="..." class="card-img-top" alt="...">
+                      <div class="card-body">
+                        <h5 class="card-title">Card title</h5>
+                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                        <a href="#" class="btn btn-primary">Go somewhere</a>
+                      </div>
+                    </div>
+                    <div class="card mx-5 my-5" style="width: 18rem;">
+                      <img src="..." class="card-img-top" alt="...">
+                      <div class="card-body">
+                        <h5 class="card-title">Card title</h5>
+                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                        <a href="#" class="btn btn-primary">Go somewhere</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            </section>
+            <!-- About Section End -->
+
+            <footer class="page-footer font-small">
+              <!-- Copyright -->
+              <div class="footer-copyright text-center pt-5 pb-4">© 2019 Copyright:
+                <a href="https://githublytics.com/"> GitHublytics.com</a>
+              </div>
+              <!-- Copyright -->
+            </footer> 
+
+        </div>
+
+        
+        <script src="/assets/js/jquery.min.js"></script>
+        <script src="/assets/js/popper.min.js"></script>
+        <script src="/assets/js/bootstrap.min.js"></script>
+    </body>
 </html>
