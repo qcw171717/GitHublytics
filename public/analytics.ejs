@@ -1,60 +1,164 @@
 <!DOCTYPE html>
 <html class="no-js" lang="en">
-    <head>
-        <title>GitHublytics</title>
-        <meta http-equiv="x-ua-compatible" content="ie=edge">
-	      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway:400,800">
-        <link rel='stylesheet' href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-        <link rel="stylesheet" href="/assets/css/bootstrap.css">
-        <link rel="stylesheet" href="/assets/css/styles.css">
-        
-    </head>
+<head>
+    <title>GitHublytics</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <body>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway:400,800">
+    <link rel='stylesheet' href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/assets/css/bootstrap.css">
+    <link rel="stylesheet" href="/assets/css/styles.css">
 
-        <div class="container">
-            <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
-                <a class="navbar-brand" href="#" onclick="goToHome()"><img src="assets/img/profile.png" class="border border-dark rounded-circle" width="50" height="50" alt="">  GitHublytics</a>
-                
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
-                  <span class="navbar-toggler-icon"></span>
+</head>
+
+<body>
+
+    <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+            <a class="navbar-brand" href="#" onclick="goToHome()"><img src="assets/img/profile.png"
+                    class="border border-dark rounded-circle" width="50" height="50" alt=""> GitHublytics</a>
+
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about" onclick="goToAbout()">About</a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#">Try it!</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://twitter.com/github_lytics" target="_blank">Contact</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/signin" target="_blank">Sign in</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <div class="row my-5 justify-content-center">
+            <label class="mr-5 pt-2 pixel-font">GitHub Username:</label>
+            <div class="form-group">
+                <input type="text" class="form-control transparent-input border border-light" placeholder="enter"
+                    id="userNameInput">
+            </div>
+            <button class="btn ml-5 mb-3 btn-outline-info btn-lg border-0" onclick="getNewUser()"
+                role="button">GET</button>
+        </div>
+    </div>
+
+
+    <div class="container-fluid">
+        <div class="row mt-4 px-5">
+            <div class="list-group list-group-flush col-3 my-auto">
+                <button type="button" class="list-group-item list-group-item-action ice-button active">
+                    Language decomposition
                 </button>
+                <button type="button" class="list-group-item disabled">Coming soon ...</button>
+            </div>
 
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav ml-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="#about" onclick="goToAbout()">About</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Try it!</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="https://twitter.com/github_lytics" target="_blank">Contact</a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
+            <div id="piechart" class="col-6">
+                <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
-            <footer class="page-footer font-small">
-              <!-- Copyright -->
-              <div class="footer-copyright text-center pt-5 pb-4">© 2019 Copyright:
-                <a href="https://githublytics.com/"> GitHublytics.com</a>
-              </div>
-              <!-- Copyright -->
-            </footer> 
+                <script type="text/javascript">
+                    let chartTitle = "";
+                    if ("<%=currUsername%>") {
+                        chartTitle = "<%=selectedRepo%>" ? "<%=selectedRepo%>" : "<%=currUsername%>" + ": Aggregated all Repos";
+                    }
+
+                    // Load google charts
+                    google.charts.load('current', { 'packages': ['corechart'] });
+                    google.charts.setOnLoadCallback(drawChart);
+
+                    // Draw the chart and set the chart values
+                    function drawChart() {
+                        const arr1D = "<%= dataArr %>".split(",");
+                        let reconstructedArr = [];
+                        for (let i = 0; i < arr1D.length; i += 2) {
+                            if (+arr1D[i + 1]) arr1D[i + 1] = +arr1D[i + 1];
+                            reconstructedArr.push([arr1D[i], arr1D[i + 1]]);
+                        }
+                        var data = google.visualization.arrayToDataTable(reconstructedArr);
+
+                        // Optional; add a title and set the width and height of the chart
+                        var options = {
+                            title: chartTitle, 'width': 650, 'height': 500, backgroundColor: { fill: 'transparent' },
+                            legend: {
+                                position: 'right',
+                                maxLines: 3,
+                                textStyle: {
+                                    color: '#ffffff'
+                                }
+                            },
+                            titleTextStyle: {
+                                color: '#deebff'
+                            }
+                        };
+
+                        // Display the chart inside the <div> element with id="piechart"
+                        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+                        chart.draw(data, options);
+                    }
+                </script>
+            </div>
+
+            <div class="col-3">
+                <label class="my-2 pixel-font">Repos:</label>
+                <ul class="list-group list-group-flush scrollable" id="repoButtonsList">
+                </ul>
+
+            </div>
 
         </div>
 
-        
-        <script src="/assets/js/jquery.min.js"></script>
-        <script src="/assets/js/popper.min.js"></script>
-        <script src="/assets/js/bootstrap.min.js"></script>
+        <footer class="page-footer font-small">
+            <!-- Copyright -->
+            <div class="footer-copyright text-center pt-5 pb-4">© 2019 Copyright:
+                <a href="https://githublytics.com/"> GitHublytics.com</a>
+            </div>
+            <!-- Copyright -->
+        </footer>
+    </div>
 
-        <script>
-            function goToHome(){window.location="/home";}
-            function goToAbout(){window.location="/home#about";}
-        </script>
-    </body>
+
+    <script src="/assets/js/jquery.min.js"></script>
+    <script src="/assets/js/popper.min.js"></script>
+    <script src="/assets/js/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script>
+        function goToHome() { window.location = "/home"; }
+        function goToAbout() { window.location = "/home#about"; }
+        window.onload = function () {
+            "<%-repoArr%>".split(",").sort(function (a, b) {
+                return a.toLowerCase().localeCompare(b.toLowerCase());
+            }).forEach((repo) => {
+                console.log(repo);
+                let list = document.getElementById('repoButtonsList');
+                let entry = document.createElement('li');
+                let btn = document.createElement("BUTTON");
+                btn.className = "list-group-item list-group-item-action rounded-0";
+                btn.onclick = function () {
+                    window.location = `/byrepo?repoName=${repo}&uid=${"<%-currUsername%>"}`;
+                };
+                btn.innerHTML = repo;
+                entry.appendChild(btn);
+                list.appendChild(entry);
+            });
+        }
+
+        function getNewUser() {
+            const userName = document.getElementById('userNameInput').value;
+            if (!userName.trim()) {
+                return swal("Search query cannot be empty.");
+            }
+            window.location = `/analyze?uid=${userName.trim()}`;
+        }
+    </script>
+</body>
+
 </html>

@@ -13,11 +13,13 @@
     "ejs": "^2.7.1",
     "express": "^4.17.1",
     "jquery": "^3.4.1",
-    "popper.js": "^1.16.0"
+    "popper.js": "^1.16.0",
+    "request": "^2.88.0"
   },
   "devDependencies": {
     "browser-sync": "^2.26.7",
     "gulp": "^4.0.2",
-    "gulp-sass": "^4.0.2"
+    "gulp-sass": "^4.0.2",
+    "nodemon": "^1.19.4"
   }
 }

@@ -1,0 +1,26 @@
+input.transparent-input {
+  background-color: rgba(0, 0, 0, 0) !important;
+  color: #89bcff !important;
+  width: 500px !important;
+}
+
+label.pixel-font {
+  font-size: 17px;
+  font-family: "Courier New";
+}
+
+.list-group.scrollable {
+  max-height: 350px;
+  margin-bottom: 10px;
+  overflow: scroll;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ice-button{
+  text-align: center;
+}
+.ice-button.active{
+  background-color: #deebff !important;
+  color: #365f9c !important;
+  font-weight: 300 !important;
+}
