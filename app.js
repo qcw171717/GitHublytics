@@ -62,22 +62,36 @@ app.get("/byrepo", function (req, res) {
   }
 
   let languagesDict = {};
-
+  if (auth_token) {
+    header = {
+      'User-Agent': 'request',
+      "Authorization": "token " + auth_token
+    };
+  } else {
+    header = {
+      'User-Agent': 'request'
+    };
+  }
   new Promise((resolveOuter, reject) => {
-    request({ url: `https://api.github.com/repos/${userId}/${repo}`, headers: { 'User-Agent': 'request', "Authorization": "token " + auth_token } },
+    request({ url: `https://api.github.com/repos/${userId}/${repo}`, headers: header },
       async (error, response, body) => {
         const data = JSON.parse(body);
-        const repoLanguageUrl = data["languages_url"];
-        request({ url: repoLanguageUrl, headers: { 'User-Agent': 'request', "Authorization": "token " + auth_token } },
-          (error, response, languageBody) => {
-            languagesDict = JSON.parse(languageBody);
-            resolveOuter([data.message, languagesDict]);
-          });
+        if (data.message) {
+          resolveOuter([data.message, {}]);
+        } else {
+          const repoLanguageUrl = data["languages_url"];
+          request({ url: repoLanguageUrl, headers: header },
+            (error, response, languageBody) => {
+              languagesDict = JSON.parse(languageBody);
+              resolveOuter([data.message, languagesDict]);
+            });
+        }
+
       });
   }).then((value) => {
-    let alert = false;
+    let alertMess = "";
     if ((value[0] && value[0].indexOf("API rate limit exceeded") == 0) || (value[1].message && value[1].message.indexOf("API rate limit exceeded") == 0)) {
-      alert = true;
+      alertMess = "GitHub API rate limit exceeded, you can get a higher rate through signing in.";
     }
 
     let languagesArray = [['Languages', 'Number of bytes']];
@@ -90,7 +104,7 @@ app.get("/byrepo", function (req, res) {
       repoArr: repoLst,
       currUsername: userId,
       selectedRepo: repo,
-      alertOrNot: alert
+      alertMessage: alertMess
     });
   });
 
@@ -102,42 +116,57 @@ app.get("/analyze", function (req, res) {
     userId = req.query.uid;
   }
   repoLst = [];
+  let header = {};
+  if (auth_token) {
+    header = {
+      'User-Agent': 'request',
+      "Authorization": "token " + auth_token
+    };
+  } else {
+    header = {
+      'User-Agent': 'request'
+    };
+  }
   new Promise((resolveOuter, reject) => {
-    request({ url: `https://api.github.com/users/${userId}/repos`, headers: { 'User-Agent': 'request', "Authorization": "token " + auth_token } },
+    request({ url: `https://api.github.com/users/${userId}/repos`, headers: header },
       async (error, response, body) => {
         const data = JSON.parse(body);
-        let languageUrls = [];
-        for (let i = 0; i < data.length; i++) {
-          languageUrls.push(...[data[i]["languages_url"]]);
-          repoLst.push(data[i]["name"]);
-        }
-        languagesDict = {};
-        let loadLanguagesPromise = [];
-        languageUrls.forEach(url => {
-          const promise = new Promise((resolveInner) => {
-            request({ url: url, headers: { 'User-Agent': 'request', "Authorization": "token " + auth_token } },
-              (error, response, languageBody) => {
-                resolveInner(languageBody);
-              });
-          }).then((innerBody) => {
-            thisLanguageDict = JSON.parse(innerBody);
-            for (let lKey in thisLanguageDict) {
-              if (lKey in languagesDict) {
-                languagesDict[lKey] += thisLanguageDict[lKey];
-              } else {
-                languagesDict[lKey] = thisLanguageDict[lKey];
+        if (data.message) {
+          resolveOuter([data.message, {}]);
+        } else {
+          let languageUrls = [];
+          for (let i = 0; i < data.length; i++) {
+            languageUrls.push(...[data[i]["languages_url"]]);
+            repoLst.push(data[i]["name"]);
+          }
+          languagesDict = {};
+          let loadLanguagesPromise = [];
+          languageUrls.forEach(url => {
+            const promise = new Promise((resolveInner) => {
+              request({ url: url, headers: header },
+                (error, response, languageBody) => {
+                  resolveInner(languageBody);
+                });
+            }).then((innerBody) => {
+              thisLanguageDict = JSON.parse(innerBody);
+              for (let lKey in thisLanguageDict) {
+                if (lKey in languagesDict) {
+                  languagesDict[lKey] += thisLanguageDict[lKey];
+                } else {
+                  languagesDict[lKey] = thisLanguageDict[lKey];
+                }
               }
-              console.log(languagesDict);
-            }
+            });
+            loadLanguagesPromise.push(promise);
           });
-          loadLanguagesPromise.push(promise);
-        });
-        await Promise.all(loadLanguagesPromise);
-        resolveOuter([data.message, languagesDict, repoLst]);
+          await Promise.all(loadLanguagesPromise);
+          resolveOuter([data.message, languagesDict, repoLst]);
+        }
       });
   }).then((value) => {
+    let alertMess = "";
     if ((value[0] && value[0].indexOf("API rate limit exceeded") == 0) || (value[1].message && value[1].message.indexOf("API rate limit exceeded") == 0)) {
-      console.log("alert");
+      alertMess = "GitHub API rate limit exceeded, you can get a higher rate through signing in.";
     }
     //make data array
     let languagesArray = [['Languages', 'Number of bytes']];
@@ -148,7 +177,8 @@ app.get("/analyze", function (req, res) {
       dataArr: languagesArray,
       repoArr: value[2],
       currUsername: userId,
-      selectedRepo: null
+      selectedRepo: null,
+      alertMessage: alertMess
     });
   });
 
