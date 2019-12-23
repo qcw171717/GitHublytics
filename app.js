@@ -8,6 +8,7 @@ const CLIENT_SECRET = "179e6fb8e94a9ca225fcac42edc3c63066791d4e";
 const REDIECT_URI = "http://localhost/signin/callback";
 
 let auth_token = "";
+let username = "";
 let repoLst = [];
 
 //set view engine to ejs
@@ -25,7 +26,7 @@ app.get("/home", function (req, res) {
 });
 
 app.get("/signin", function (req, res) {
-  res.redirect(`https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIECT_URI}`);
+  res.redirect(`https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIECT_URI}&scope=repo`);
 });
 
 app.get("/signin/callback", function (req, res) {
@@ -72,7 +73,7 @@ app.get("/byrepo", function (req, res) {
       'User-Agent': 'request'
     };
   }
-  new Promise((resolveOuter, reject) => {
+  new Promise((resolveOuter, reject) => {//
     request({ url: `https://api.github.com/repos/${userId}/${repo}`, headers: header },
       async (error, response, body) => {
         const data = JSON.parse(body);
@@ -99,28 +100,43 @@ app.get("/byrepo", function (req, res) {
       languagesArray.push([lKey, value[1][lKey]]);
     }
 
-    res.render(path.join(__dirname, 'public/analytics.ejs'), {
-      dataArr: languagesArray,
-      repoArr: repoLst,
-      currUsername: userId,
-      selectedRepo: repo,
-      alertMessage: alertMess
-    });
+    request({ url: "https://api.github.com/user", headers: header },
+      (error, response, userBody) => {
+        if (JSON.parse(userBody).login) { //logged in
+          username = JSON.parse(userBody).login;
+        }
+        res.render(path.join(__dirname, 'public/analytics.ejs'), {
+          dataArr: languagesArray,
+          repoArr: repoLst,
+          currUsername: userId,
+          selectedRepo: repo,
+          alertMessage: alertMess,
+          userId: username
+        });
+      });
+
   });
 
 });
 
 app.get("/analyze", function (req, res) {
   let userId = "";
+  let outerQueryUrl = "";
   if (req.query.uid) {
     userId = req.query.uid;
+  }
+  if (req.query.ownRepos){
+    outerQueryUrl = "https://api.github.com/user/repos";
+  }else{
+    outerQueryUrl = `https://api.github.com/users/${userId}/repos`;
   }
   repoLst = [];
   let header = {};
   if (auth_token) {
     header = {
       'User-Agent': 'request',
-      "Authorization": "token " + auth_token
+      "Authorization": "token " + auth_token,
+      "X-OAuth-Scopes": "repo"
     };
   } else {
     header = {
@@ -128,7 +144,7 @@ app.get("/analyze", function (req, res) {
     };
   }
   new Promise((resolveOuter, reject) => {
-    request({ url: `https://api.github.com/users/${userId}/repos`, headers: header },
+    request({ url: outerQueryUrl, headers: header },
       async (error, response, body) => {
         const data = JSON.parse(body);
         if (data.message) {
@@ -173,13 +189,21 @@ app.get("/analyze", function (req, res) {
     for (let lKey in value[1]) {
       languagesArray.push([lKey, value[1][lKey]]);
     }
-    res.render(path.join(__dirname, 'public/analytics.ejs'), {
-      dataArr: languagesArray,
-      repoArr: value[2],
-      currUsername: userId,
-      selectedRepo: null,
-      alertMessage: alertMess
-    });
+    request({ url: "https://api.github.com/user", headers: header },
+      (error, response, userBody) => {
+        if (JSON.parse(userBody).login) {
+          username = JSON.parse(userBody).login;
+        }
+        res.render(path.join(__dirname, 'public/analytics.ejs'), {
+          dataArr: languagesArray,
+          repoArr: value[2],
+          currUsername: userId,
+          selectedRepo: null,
+          alertMessage: alertMess,
+          userId: username
+        });
+      });
+
   });
 
 });

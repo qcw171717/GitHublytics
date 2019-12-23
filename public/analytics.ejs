@@ -55,8 +55,12 @@
 
     <div class="container-fluid">
         <div class="row mt-4 px-5">
+
             <div class="list-group list-group-flush col-3 my-auto">
-                <button type="button" class="list-group-item list-group-item-action ice-button active">
+                <button type="button" class="btn btn-outline-primary mb-4" onclick="showMyRepos()">
+                    My repos
+                </button>
+                <button type="button" class="list-group-item list-group-item-action ice-button active" onclick="languageDecomp()">
                     Language decomposition
                 </button>
                 <button type="button" class="list-group-item disabled">Coming soon ...</button>
@@ -67,9 +71,7 @@
 
                 <script type="text/javascript">
                     let chartTitle = "";
-                    if ("<%=currUsername%>") {
-                        chartTitle = "<%=selectedRepo%>" ? "<%=selectedRepo%>" : "Aggregated all Repos";
-                    }
+                    chartTitle = "<%=selectedRepo%>" ? "<%=selectedRepo%>" : "Aggregated all Repos";
 
                     // Load google charts
                     google.charts.load('current', { 'packages': ['corechart'] });
@@ -131,6 +133,7 @@
     <script src="/assets/js/bootstrap.min.js"></script>
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script>
+        let selectedFunction = "languageDecomp"; //as default
         function goToHome() { window.location = "/home"; }
         function goToAbout() { window.location = "/home#about"; }
         window.onload = function () {
@@ -140,7 +143,7 @@
             if ("<%=currUsername%>") {
                 document.getElementById("repoLabel").innerHTML = "<%=currUsername%>" ? "<%=currUsername%>" + " Repos:" : "Repos:";
             }
-            
+
             "<%-repoArr%>".split(",").sort(function (a, b) {
                 return a.toLowerCase().localeCompare(b.toLowerCase());
             }).forEach((repo) => {
@@ -150,7 +153,16 @@
                 let btn = document.createElement("BUTTON");
                 btn.className = "list-group-item list-group-item-action rounded-0";
                 btn.onclick = function () {
-                    window.location = `/byrepo?repoName=${repo}&uid=${"<%-currUsername%>"}`;
+                    console.log("<%-currUsername%>");
+                    if (!"<%=currUsername%>") {
+                        if (!"<%-userId%>"){
+                            swal("Something went wrong, please search for a valid GitHub user.")
+                        }else{
+                            window.location = `/byrepo?repoName=${repo}&uid=${"<%-userId%>"}`;
+                        }
+                    }else{
+                        window.location = `/byrepo?repoName=${repo}&uid=${"<%-currUsername%>"}`;
+                    }
                 };
                 btn.innerHTML = repo;
                 entry.appendChild(btn);
@@ -165,6 +177,14 @@
             }
             window.location = `/analyze?uid=${userName.trim()}`;
         }
+
+        function showMyRepos(){
+            if (!"<%=userId%>") {
+                return swal("You must log in to see your repos.");
+            }
+            window.location = `/analyze?ownRepos=True`;
+        }
+
     </script>
 </body>
 
