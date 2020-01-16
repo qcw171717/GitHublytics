@@ -5,7 +5,7 @@ const app = express();
 
 const CLIENT_ID = "7229d956c71f7b848163";
 const CLIENT_SECRET = "179e6fb8e94a9ca225fcac42edc3c63066791d4e";
-const REDIECT_URI = "http://localhost/signin/callback";
+const REDIECT_URI = "http://githublytics.com/signin/callback";
 
 let auth_token = "";
 let username = "";
@@ -73,7 +73,7 @@ app.get("/byrepo", function (req, res) {
       'User-Agent': 'request'
     };
   }
-  new Promise((resolveOuter, reject) => {//
+  new Promise((resolveOuter, reject) => {
     request({ url: `https://api.github.com/repos/${userId}/${repo}`, headers: header },
       async (error, response, body) => {
         const data = JSON.parse(body);
